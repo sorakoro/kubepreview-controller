@@ -1,0 +1,52 @@
+name: Release
+
+on:
+  push:
+    tags:
+      - "v*"
+
+permissions: {}
+
+jobs:
+  release:
+    permissions:
+      contents: write
+      packages: write
+    runs-on: ubuntu-latest
+    steps:
+      - name: Clone the code
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+        with:
+          persist-credentials: false
+
+      - name: Setup Go
+        uses: actions/setup-go@4b73464bb391d4059bd26b0524d20df3927bd417 # v6.3.0
+        with:
+          go-version-file: go.mod
+
+      - name: Log in to GitHub Container Registry
+        uses: docker/login-action@74a5d142397b4f367a81961eba4e8cd7edddf772 # v3.4.0
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Setup kustomize
+        run: make kustomize
+
+      - name: Build and push image
+        run: |
+          IMG=ghcr.io/${{ github.repository }}:${GITHUB_REF_NAME}
+          make docker-build IMG=${IMG}
+          docker push ${IMG}
+
+      - name: Generate install.yaml
+        run: |
+          IMG=ghcr.io/${{ github.repository }}:${GITHUB_REF_NAME}
+          make build-installer IMG=${IMG}
+
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@da05d552573ad5aba039eaac05058a918a7bf631 # v2.5.0
+        with:
+          generate_release_notes: true
+          files: dist/install.yaml

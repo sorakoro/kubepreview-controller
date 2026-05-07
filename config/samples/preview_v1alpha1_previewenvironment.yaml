@@ -1,0 +1,21 @@
+apiVersion: preview.wow.one/v1alpha1
+kind: PreviewEnvironment
+metadata:
+  name: previewenvironment-sample
+  namespace: default
+spec:
+  identifier: "pr-123"
+  image: "myapp:pr-123"
+  deployments:
+    - name: api-server
+  services:
+    - name: api-server
+  replicas: 1
+  ttl: "72h"
+  routing:
+    hosts:
+      - "api-staging.example.com"
+    gateways:
+      - "istio-system/default-gateway"
+    serviceName: "api-server"
+    port: 80
