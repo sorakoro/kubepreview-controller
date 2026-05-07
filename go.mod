@@ -5,7 +5,7 @@ go 1.25.7
 require (
 	github.com/onsi/ginkgo/v2 v2.27.2
 	github.com/onsi/gomega v1.38.2
-	istio.io/api v1.29.2-0.20260408155000-a0e4e1cbfcc5
+	istio.io/api v1.30.0-rc.0
 	istio.io/client-go v1.29.2
 	k8s.io/api v0.35.0
 	k8s.io/apimachinery v0.35.0
