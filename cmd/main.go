@@ -35,7 +35,7 @@ import (
 	metricsserver "sigs.k8s.io/controller-runtime/pkg/metrics/server"
 	"sigs.k8s.io/controller-runtime/pkg/webhook"
 
-	istiov1 "istio.io/client-go/pkg/apis/networking/v1"
+	istiov1 "istio.io/client-go/pkg/apis/networking/v1beta1"
 
 	previewv1alpha1 "github.com/wedinc/kubepreview-controller/api/v1alpha1"
 	"github.com/wedinc/kubepreview-controller/internal/controller"
