@@ -1,21 +1,21 @@
 # kubepreview-controller
 
-PRごとにプレビュー環境を自動作成するKubernetesコントローラー。
+A Kubernetes controller that automatically creates preview environments per pull request.
 
-既存のDeployment/Serviceを複製し、Istio VirtualServiceによるヘッダーベースルーティングでプレビュー環境へのアクセスを提供します。
+It clones existing Deployments and Services, then provides access to preview environments via header-based routing using Istio VirtualService.
 
-## 仕組み
+## How It Works
 
-`PreviewEnvironment` カスタムリソースを作成すると、コントローラーが以下を自動で行います：
+When you create a `PreviewEnvironment` custom resource, the controller automatically:
 
-1. 指定されたDeploymentを複製し、コンテナイメージをPR用に差し替え
-2. 指定されたServiceを複製し、プレビュー用Podへ向ける
-3. VirtualServiceを作成し、特定のHTTPヘッダーでプレビュー環境にルーティング
-4. TTLを設定した場合、期限切れで自動削除
+1. Clones the specified Deployment and replaces the container image with the PR version
+2. Clones the specified Service and points it to the preview Pods
+3. Creates a VirtualService that routes traffic to the preview environment based on a specific HTTP header
+4. Automatically deletes the environment when the TTL expires (if configured)
 
-## 使い方
+## Usage
 
-### サンプル
+### Example
 
 ```yaml
 apiVersion: preview.wow.one/v1alpha1
@@ -41,63 +41,69 @@ spec:
     port: 80
 ```
 
-上記を適用すると以下のリソースが作成されます：
+Applying the above creates the following resources:
 
-- `Deployment/api-server-pr-123`（イメージ: `myapp:pr-123`）
+- `Deployment/api-server-pr-123` (image: `myapp:pr-123`)
 - `Service/api-server-pr-123`
-- `VirtualService/api-server-pr-123`（`x-preview-env: pr-123` ヘッダーでルーティング）
+- `VirtualService/api-server-pr-123` (routes via `x-preview-env: pr-123` header)
 
-### プレビュー環境へのアクセス
+### Accessing Preview Environments
 
-リクエストに `x-preview-env` ヘッダーを付与するとプレビュー環境にルーティングされます：
+Add the `x-preview-env` header to your request to route traffic to the preview environment:
 
 ```bash
 curl -H "Host: api-staging.example.com" -H "x-preview-env: pr-123" http://<ingress-gateway>/
 ```
 
-## 前提条件
+## Prerequisites
 
-- Go v1.24.6+
+- Go v1.26.0+
 - kubectl v1.11.3+
-- Kubernetes v1.11.3+ クラスタ
+- Kubernetes v1.11.3+ cluster
 - Istio
 
-## セットアップ
+## Setup
 
-### ローカル開発
+### Install from Release Manifest
 
 ```bash
-# CRDをクラスタにインストール
+kubectl apply -f https://github.com/sorakoro/kubepreview-controller/releases/latest/download/install.yaml
+```
+
+### Local Development
+
+```bash
+# Install CRDs into the cluster
 make install
 
-# コントローラーをローカルで起動
+# Run the controller locally
 make run
 ```
 
-### クラスタへのデプロイ
+### Build and Deploy from Source
 
 ```bash
-# イメージをビルド・プッシュ
+# Build and push the image
 make docker-build docker-push IMG=<registry>/kubepreview-controller:<tag>
 
-# デプロイ
+# Deploy
 make deploy IMG=<registry>/kubepreview-controller:<tag>
 ```
 
-### アンインストール
+### Uninstall
 
 ```bash
 make undeploy
 make uninstall
 ```
 
-## テスト
+## Testing
 
 ```bash
-# ユニットテスト
+# Unit tests
 make test
 
-# E2Eテスト（Kindクラスタを使用）
+# E2E tests (uses a Kind cluster)
 make test-e2e
 ```
 
