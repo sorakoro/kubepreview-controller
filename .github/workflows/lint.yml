@@ -3,7 +3,21 @@ name: Lint
 on:
   push:
     branches: [main]
+    paths:
+      - "**.go"
+      - "go.mod"
+      - "go.sum"
+      - "Makefile"
+      - ".golangci.yml"
+      - ".github/workflows/lint.yml"
   pull_request:
+    paths:
+      - "**.go"
+      - "go.mod"
+      - "go.sum"
+      - "Makefile"
+      - ".golangci.yml"
+      - ".github/workflows/lint.yml"
 
 permissions: {}
 
