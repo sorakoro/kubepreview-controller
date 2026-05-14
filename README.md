@@ -58,17 +58,11 @@ curl -H "Host: api-staging.example.com" -H "x-preview-env: pr-123" http://<ingre
 ## Prerequisites
 
 - Go v1.26.0+
-- kubectl v1.11.3+
-- Kubernetes v1.11.3+ cluster
-- Istio
+- kubectl v1.34.0+
+- Kubernetes v1.34.0+ cluster
+- Istio v1.29+
 
 ## Setup
-
-### Install from Release Manifest
-
-```bash
-kubectl apply -f https://github.com/sorakoro/kubepreview-controller/releases/latest/download/install.yaml
-```
 
 ### Local Development
 
@@ -78,6 +72,12 @@ make install
 
 # Run the controller locally
 make run
+```
+
+### Install from Release Manifest
+
+```bash
+kubectl apply -f https://github.com/sorakoro/kubepreview-controller/releases/latest/download/install.yaml
 ```
 
 ### Build and Deploy from Source
